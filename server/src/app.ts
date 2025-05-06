@@ -2,11 +2,13 @@ import "module-alias/register";
 import express from "express";
 import * as dotenv from "dotenv";
 import authRoutes from "@/routes/auth.routes";
+import cors from "cors"
 
 dotenv.config();
 const app = express();
 
 app.use(express.json());
+app.use(cors())
 
 app.get("/", (req, res) => {
   res.json({ message: "Hello World" });

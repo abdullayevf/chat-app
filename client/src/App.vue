@@ -1,12 +1,20 @@
 <script setup lang="ts">
-import { Button } from "@/components/ui/button";
+import {Toaster} from "./components/ui/sonner"
 </script>
 
 <template>
-  <div class="min-h-screen w-full bg-slate-900">
-    <div class="container mx-auto p-4 pt-20">
-      <h1 class="text-2xl font-bold text-center text-white">Real-Time Chat</h1>
-      <Button variant="outline">Login</Button>
-    </div>
+  <div class="min-h-screen text-white w-full bg-slate-900 p-4">
+    <Toaster 
+      richColors
+      position="bottom-right"
+    />
+    <nav class="flex gap-2 font-semibold text-sm text-slate-400">
+      <RouterLink to="/" class=" hover:text-white">Home</RouterLink>
+      <span>/</span>
+      <RouterLink to="/login" class=" hover:text-white">Login</RouterLink>
+    </nav>
+    <RouterView class="mt-4"/>
   </div>
+
+
 </template>

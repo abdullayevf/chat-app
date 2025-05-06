@@ -1,40 +1,102 @@
 <script setup lang="ts">
-import { ref } from "vue";
-import { useRouter } from "vue-router";
+import { toTypedSchema } from '@vee-validate/zod'
+import { useForm } from 'vee-validate'
+import * as z from 'zod'
+import {useRouter} from 'vue-router'
 
-const email = ref("test@example.com");
-const password = ref("password");
-const error = ref("");
+import {
+  FormControl,
+  FormDescription,
+  FormField,
+  FormItem,
+  FormLabel,
+  FormMessage
+} from '../components/ui/form'
+import { Input } from "../components/ui/input"
+import { Button } from "../components/ui/button"
+import { toast } from 'vue-sonner'
 
-const router = useRouter();
+const formSchema = toTypedSchema(z.object({
+  email: z.string().email("Invalid email address"),
+  password: z.string()
+    .min(8, "Password must be at least 8 characters long")
+    .max(16, "Password must be less than 16 characters long")
+}))
 
-const handleLogin = async () => {
+const router = useRouter()
+
+const form = useForm({
+  validationSchema: formSchema,
+})
+
+const onSubmit = form.handleSubmit((values) => {
+  login(values.email, values.password)
+})
+
+async function login(email: string, password: string) {
   try {
-    const res = await fetch("http://localhost:3000/api/login", {
+    const response = await fetch("http://localhost:3000/api/auth/login", {
       method: "POST",
       headers: {
-        "Content-Type": "application/json",
+        "Content-Type": "application/json"
       },
       body: JSON.stringify({
-        email: email.value,
-        password: password.value,
-      }),
-    });
+        email,
+        password
+      })
+    })
 
-    if (!res.ok) {
-      throw new Error("Login failed");
+    const data = await response.json()
+
+    if (!response.ok) {
+      throw new Error(data.message || 'Login failed')
     }
 
-    const { token } = await res.json();
+    toast.success('Login successful', {
+      description: "You will now be rediercted to your chats."
+    })
 
-    localStorage.setItem("auth_token", token);
-    router.push("/chat");
-  } catch (err) {
-    error.value = "Login failed. Please check your credentials.";
+    localStorage.setItem("token", data.token)
+
+    router.push("/chat")
+
+    console.log('Login successful:', data)
+
+  } catch (error) {
+    console.error('Login error:', error)
+    toast.error('Login failed', {
+      description: error instanceof Error ? error.message : 'An unexpected error occurred'
+    })
   }
-};
+}
+
 </script>
 
 <template>
-    <h1>Login View</h1>
+  <div>
+    <h1 class="text-center font-bold mb-4">Login View</h1>
+    <form @submit.prevent="onSubmit" class="bg-white space-y-4 text-slate-400 rounded-lg p-4 max-w-96 mx-auto">
+
+      <FormField v-slot="{ componentField }" name="email">
+        <FormItem>
+          <FormLabel>Email</FormLabel>
+          <FormControl>
+            <Input type="email" placeholder="example@mail.com" v-bind="componentField" />
+          </FormControl>
+          <FormMessage />
+        </FormItem>
+      </FormField>
+      <FormField v-slot="{ componentField }" name="password">
+        <FormItem>
+          <FormLabel>Password</FormLabel>
+          <FormControl>
+            <Input type="password" placeholder="safepassword" v-bind="componentField" />
+          </FormControl>
+        </FormItem>
+      </FormField>
+      <Button type="submit">
+        Submit
+      </Button>
+    </form>
+  </div>
 </template>
