@@ -3,6 +3,7 @@ import { toTypedSchema } from '@vee-validate/zod'
 import { useForm } from 'vee-validate'
 import * as z from 'zod'
 import {useRouter} from 'vue-router'
+import { useAuthStore } from '../stores/auth'
 
 import {
   FormControl,
@@ -24,6 +25,7 @@ const formSchema = toTypedSchema(z.object({
 }))
 
 const router = useRouter()
+const authStore = useAuthStore()
 
 const form = useForm({
   validationSchema: formSchema,
@@ -53,11 +55,10 @@ async function login(email: string, password: string) {
     }
 
     toast.success('Login successful', {
-      description: "You will now be rediercted to your chats."
+      description: "You will now be redirected to your chats."
     })
 
-    localStorage.setItem("token", data.token)
-
+    authStore.setToken(data.token)
     router.push("/chat")
 
     console.log('Login successful:', data)

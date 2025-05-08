@@ -1,6 +1,10 @@
 @import "tailwindcss";
 @import "tw-animate-css";
 
+* {
+  transition: all 0.2s;
+}
+
 @custom-variant dark (&:is(.dark *));
 
 @theme inline {
