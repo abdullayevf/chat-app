@@ -23,3 +23,9 @@ export const login = async (req: Request, res: Response): Promise<void> => {
 
   res.status(200).json({ token });
 };
+
+export const register = async (req: Request, res: Response): Promise<void> => {
+  const {email, username, password} = req.body;
+
+
+}

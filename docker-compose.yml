@@ -1,0 +1,14 @@
+services:
+  postgres:
+    image: postgres
+    container_name: chatapp-db
+    restart: always
+    ports:
+      - "5432:5432"
+    environment:
+      POSTGRES_HOST_AUTH_METHOD: trust
+    volumes:
+      - pgdata:/var/lib/postgresql/data
+
+volumes:
+  pgdata:
