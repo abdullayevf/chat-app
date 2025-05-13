@@ -8,13 +8,12 @@
 </template>
 <script setup>
 import { Button } from "@/components/ui/button"
-import {useAuthStore} from "@/stores/auth"
+import { useAuthStore } from "@/stores/auth"
+import { toast } from 'vue-sonner'
 
 const authStore = useAuthStore()
 
-const deleteUser =  async () => {
-    console.log(authStore.token);
-    
+const deleteUser = async () => {
     const response = await fetch("http://localhost:3000/api/auth/delete", {
         method: "DELETE",
         headers: {
@@ -24,12 +23,14 @@ const deleteUser =  async () => {
     })
 
     if (!response.ok) {
-        console.log(response)
+        console.log(response.json())
     }
 
     if (response.ok) {
+        toast.success('User deleted successfully', {
+            description: "You will now be redirected to the home page."
+        })
         authStore.logout()
-        console.log("User deleted successfully")
     }
 }
 </script>
