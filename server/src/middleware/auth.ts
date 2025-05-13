@@ -2,6 +2,7 @@ import { Response, NextFunction } from "express";
 import { CustomRequest } from "@/types";
 import jwt from "jsonwebtoken";
 import * as dotenv from "dotenv";
+import { log } from "console";
 
 dotenv.config();
 
@@ -18,10 +19,12 @@ export const authenticate = (
   }
 
   try {
+    console.log(req.headers.authorization);
+    
     const decoded = jwt.verify(token, process.env.JWT_SECRET!);
     req.user = decoded;
     next(); 
   } catch (error) {
-    res.status(401).json({ message: "Invalid token" });
+    res.status(401).json({ message:  error });
   }
 };
