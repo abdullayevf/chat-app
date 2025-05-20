@@ -2,12 +2,10 @@
 import { toTypedSchema } from '@vee-validate/zod'
 import { useForm } from 'vee-validate'
 import * as z from 'zod'
-import {useRouter} from 'vue-router'
-import { useAuthStore } from '../stores/auth'
+import { useAuthService } from '@/services/auth.service'
 
 import {
   FormControl,
-  FormDescription,
   FormField,
   FormItem,
   FormLabel,
@@ -15,7 +13,6 @@ import {
 } from '../components/ui/form'
 import { Input } from "../components/ui/input"
 import { Button } from "../components/ui/button"
-import { toast } from 'vue-sonner'
 
 const formSchema = toTypedSchema(z.object({
   email: z.string().email("Invalid email address"),
@@ -23,53 +20,15 @@ const formSchema = toTypedSchema(z.object({
     .min(8, "Password must be at least 8 characters long")
     .max(16, "Password must be less than 16 characters long")
 }))
-
-const router = useRouter()
-const authStore = useAuthStore()
+const authService = useAuthService()
 
 const form = useForm({
   validationSchema: formSchema,
 })
 
-const onSubmit = form.handleSubmit((values) => {
-  login(values.email, values.password)
+const onSubmit = form.handleSubmit(async (values) => {
+  await authService.login(values.email, values.password)
 })
-
-async function login(email: string, password: string) {
-  try {
-    const response = await fetch("http://localhost:3000/api/auth/login", {
-      method: "POST",
-      headers: {
-        "Content-Type": "application/json"
-      },
-      body: JSON.stringify({
-        email,
-        password
-      })
-    })
-
-    const data = await response.json()
-
-    if (!response.ok) {
-      throw new Error(data.message || 'Login failed')
-    }
-
-    toast.success('Login successful', {
-      description: "You will now be redirected to your chats."
-    })
-
-    authStore.setToken(data.token)
-    router.push("/chat")
-
-    console.log('Login successful:', data)
-
-  } catch (error) {
-    console.error('Login error:', error)
-    toast.error('Login failed', {
-      description: error instanceof Error ? error.message : 'An unexpected error occurred'
-    })
-  }
-}
 
 </script>
 

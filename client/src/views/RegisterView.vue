@@ -2,12 +2,10 @@
 import { toTypedSchema } from '@vee-validate/zod'
 import { useForm } from 'vee-validate'
 import * as z from 'zod'
-import { useRouter } from 'vue-router'
-import { useAuthStore } from '../stores/auth'
+import { useAuthService } from '@/services/auth.service'
 
 import {
     FormControl,
-    FormDescription,
     FormField,
     FormItem,
     FormLabel,
@@ -15,7 +13,6 @@ import {
 } from '../components/ui/form'
 import { Input } from "../components/ui/input"
 import { Button } from "../components/ui/button"
-import { toast } from 'vue-sonner'
 
 const formSchema = toTypedSchema(z.object({
     email: z.string().email("Invalid email address"),
@@ -24,52 +21,15 @@ const formSchema = toTypedSchema(z.object({
         .max(16, "Password must be less than 16 characters long")
 }))
 
-const router = useRouter()
-const authStore = useAuthStore()
+const authService = useAuthService()
 
 const form = useForm({
     validationSchema: formSchema,
 })
 
-const onSubmit = form.handleSubmit((values) => {
-    register(values.email, values.password)
+const onSubmit = form.handleSubmit(async(values) => {
+    await authService.register(values.email, values.password)
 })
-
-async function register(email: string, password: string) {
-    try {
-        const response = await fetch("http://localhost:3000/api/auth/register", {
-            method: "POST",
-            headers: {
-                "Content-Type": "application/json"
-            },
-            body: JSON.stringify({
-                email,
-                password
-            })
-        })
-
-        const data = await response.json()
-
-        if (!response.ok) {
-            throw new Error(data.message || 'Login failed')
-        }
-
-        toast.success('Registration successful', {
-            description: "You will now be redirected to your profile."
-        })
-
-        authStore.setToken(data.token)
-        router.push("/profile")
-
-        console.log('Registration successful:', data)
-
-    } catch (error) {
-        console.error('Registration error:', error)
-        toast.error('Registration failed', {
-            description: error instanceof Error ? error.message : 'An unexpected error occurred'
-        })
-    }
-}
 
 </script>
 

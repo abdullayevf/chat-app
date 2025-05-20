@@ -1,5 +1,5 @@
 <template>
     <div>
-        <h1>Ladies and gentlement, welcome to the ChatView</h1>
+        <h1>Ladies and gentlemen, welcome to the ChatView</h1>
     </div>
 </template>

@@ -9,6 +9,11 @@ export interface UserPayload {
     password: string
 }
 
+interface JWTPayload {
+    id: string
+    exp: number
+}
+
 export const useAuthStore = defineStore('auth', () => {
     const token = ref<string | null>(localStorage.getItem('auth_token'))
     const user = ref<UserPayload | null>(null)
@@ -17,21 +22,43 @@ export const useAuthStore = defineStore('auth', () => {
     const isAuthenticated = computed(() => {
         if (!token.value) return false
         try {
-            const payload = jwtDecode(token.value) as any
+            const payload = jwtDecode(token.value) as JWTPayload
             return payload.exp * 1000 > Date.now()
         } catch {
             return false
         }
     })
 
+    async function initialize() {
+        if (!token.value) return
+        
+        try {
+            const response = await fetch("http://localhost:3000/api/auth/me", {
+                headers: {
+                    "Authorization": `Bearer ${token.value}`
+                }
+            })
+            
+            if (!response.ok) {
+                throw new Error('Failed to fetch user data')
+            }
+
+            const userData = await response.json()
+            user.value = userData
+        } catch (error) {
+            console.error('Error initializing auth store:', error)
+            logout()
+        }
+    }
+
     function setToken(newToken: string) {
         token.value = newToken
         localStorage.setItem('auth_token', newToken)
-        try {
-            user.value = jwtDecode(newToken)
-        } catch {
-            console.error('Invalid token format')
-        }
+        initialize() // Fetch user data after setting token
+    }
+
+    function setUser(userData: UserPayload) {
+        user.value = userData
     }
 
     function logout() {
@@ -46,6 +73,8 @@ export const useAuthStore = defineStore('auth', () => {
         user,
         logout,
         setToken,
+        setUser,
+        initialize,
         isAuthenticated 
     }
 })
