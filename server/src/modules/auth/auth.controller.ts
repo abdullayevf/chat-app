@@ -82,3 +82,17 @@ export const deleteUser = async (req: Request, res: Response): Promise<void> => 
     res.status(500).json({message: "Internal server error <3", error})
   }
 }
+
+export const getUser = async (req: Request, res: Response): Promise<void> => {
+  const reqUser = req.user as JwtPayload;
+
+  try {
+    const user = await prisma.user.findUnique({
+      where: {id: reqUser.id}
+    })
+
+    res.status(200).json(user)
+  } catch (error) {
+    res.status(500).json({message: "Internal server error <3", error})
+  }
+}
