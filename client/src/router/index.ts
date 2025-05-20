@@ -50,7 +50,7 @@ router.beforeEach((to, from, next) => {
         return next({ name: 'login' })
     }
 
-    if (to.name === 'login' && isAuthenticated) {
+    if ((to.name === 'register' || to.name === 'login') && isAuthenticated) {
         return next({ name: 'chat' })
     }
 

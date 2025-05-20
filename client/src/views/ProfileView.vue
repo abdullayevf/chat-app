@@ -1,9 +1,9 @@
 <template>
-    <div>
+    <div class="flex items-center justify-between pt-8">
         <h1>
-            This is your profile my buddy
+            {{authStore.user}}
         </h1>
-        <Button @click="deleteUser">Delete My Account</Button>
+        <Button @click="deleteUser" variant="destructive">Delete My Account</Button>
     </div>
 </template>
 <script setup>

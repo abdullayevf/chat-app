@@ -5,7 +5,6 @@ import { useRouter } from 'vue-router'
 
 export interface UserPayload {
     id: string
-    nickname: string
     email: string
     password: string
 }
