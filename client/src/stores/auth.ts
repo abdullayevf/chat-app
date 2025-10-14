@@ -2,6 +2,7 @@ import { defineStore } from 'pinia'
 import { computed, ref } from 'vue'
 import {jwtDecode} from 'jwt-decode'
 import { useRouter } from 'vue-router'
+import { socketService } from '@/services/socket.service'
 
 export interface UserPayload {
     id: string
@@ -45,6 +46,11 @@ export const useAuthStore = defineStore('auth', () => {
 
             const userData = await response.json()
             user.value = userData
+            
+            // Reconnect to Socket.IO if we have a valid token (e.g., page refresh)
+            if (token.value && !socketService.isConnected()) {
+                socketService.connect(token.value)
+            }
         } catch (error) {
             console.error('Error initializing auth store:', error)
             logout()
@@ -55,6 +61,9 @@ export const useAuthStore = defineStore('auth', () => {
         token.value = newToken
         localStorage.setItem('auth_token', newToken)
         initialize() // Fetch user data after setting token
+        
+        // Connect to Socket.IO with new token
+        socketService.connect(newToken)
     }
 
     function setUser(userData: UserPayload) {
@@ -65,6 +74,10 @@ export const useAuthStore = defineStore('auth', () => {
         token.value = null
         user.value = null
         localStorage.removeItem('auth_token')
+        
+        // Disconnect from Socket.IO
+        socketService.disconnect()
+        
         router.push('/')
     }
 

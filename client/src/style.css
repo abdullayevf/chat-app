@@ -1,13 +1,24 @@
-@import "tailwindcss";
-@import "tw-animate-css";
-
+/* Import font from Bunny Fonts (privacy-friendly) or Google Fonts */
+@import url(https://fonts.bunny.net/css?family=alexandria:100,200,300,400,500,600,700,800,900);
 * {
   transition: all 0.2s;
 }
 
+@import "tailwindcss";
+@import "tw-animate-css";
+
 @custom-variant dark (&:is(.dark *));
 
 @theme inline {
+  /* Font family configuration */
+  --font-sans: 'Alexandria', sans-serif;
+
+  
+  /* Container configuration */
+  --container-center: true;
+  --container-padding: 1rem;
+  
+  /* Color configuration */
   --color-background: var(--background);
   --color-foreground: var(--foreground);
   --color-card: var(--card);
@@ -122,6 +133,25 @@
     @apply border-border outline-ring/50;
   }
   body {
-    @apply bg-background text-foreground;
+    @apply bg-background text-foreground font-sans;
+  }
+}
+
+/* Custom container utilities (optional) */
+@layer utilities {
+  .container-custom {
+    width: 80%;
+    max-width: 1200px;
+    margin-left: auto;
+    margin-right: auto;
+    padding-left: 2rem;
+    padding-right: 2rem;
+  }
+  
+  @media (max-width: 768px) {
+    .container-custom {
+      padding-left: 1rem;
+      padding-right: 1rem;
+    }
   }
 }

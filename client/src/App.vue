@@ -11,6 +11,7 @@ const authStore = useAuthStore()
     <Toaster richColors position="bottom-right" />
     <div class="container mx-auto p-4">
       <header class="flex text-slate-400 items-center justify-between">
+        <div class="container-custom flex items-center justify-between ">
         <nav class="flex gap-2 font-semibold text-sm">
           <template v-if="!authStore.isAuthenticated">
             <RouterLink to="/" class="hover:text-white">Home</RouterLink>
@@ -28,9 +29,10 @@ const authStore = useAuthStore()
         </nav>
         <LogOut v-if="authStore.isAuthenticated" class="cursor-pointer hover:text-white" :size="16"
           @click="authStore.logout" />
+        </div>
       </header>
     </div>
-    <div class="container mx-auto px-4">
+    <div class="container-custom mx-auto px-4">
       <RouterView />
     </div>
   </div>
